@@ -159,11 +159,11 @@ class _EnforcerVerificationDetailState
                   height: size.height * 0.2,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    itemCount: widget.userData.docs.length,
+                    itemCount: widget.userData.docs!.length,
                     separatorBuilder: (context, index) =>
                         SizedBox(width: size.width * 0.03),
                     itemBuilder: (context, index) {
-                      String imageUrl = widget.userData.docs.elementAt(index);
+                      String imageUrl = widget.userData.docs!.elementAt(index);
                       return Container(
                         decoration: BoxDecoration(
                           border: Border.all(

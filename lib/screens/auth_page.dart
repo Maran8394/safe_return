@@ -168,14 +168,6 @@ class _AuthPageState extends State<AuthPage> {
                           ),
                         ),
                       SizedBox(height: size.height * 0.02),
-                      if (isPublic)
-                        InputWidget(
-                          prefixIcon: const Icon(Icons.person),
-                          hintText: "User Id",
-                          controller: _userId,
-                          isRequired: (isPublic) ? true : false,
-                        ),
-                      SizedBox(height: size.height * 0.01),
                       InputWidget(
                         prefixIcon: const Icon(Icons.email),
                         hintText: "Email",

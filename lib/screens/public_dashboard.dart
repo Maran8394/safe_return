@@ -209,7 +209,7 @@ class ProfileCard extends StatelessWidget {
                     },
                   ),
                 ),
-                _buildRow("USER ID", userData.userId!),
+                // _buildRow("USER ID", userData.userId!),
                 _buildRow("EMAIL", userData.email!),
                 _buildRow("CONTACT", userData.contactNumber!),
               ],

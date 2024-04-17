@@ -85,7 +85,6 @@ String constructFCMPayload(String? token) {
 
 Future<void> sendPushMessage(token) async {
   if (token == null) {
-    print('Unable to send FCM message, no token exists.');
     return;
   }
 
@@ -97,8 +96,5 @@ Future<void> sendPushMessage(token) async {
       },
       body: constructFCMPayload(token),
     );
-    print('FCM request for device sent!');
-  } catch (e) {
-    print(e);
-  }
+  } catch (e) {}
 }

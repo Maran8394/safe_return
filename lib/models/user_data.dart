@@ -14,7 +14,7 @@ class UserData {
   final String? userType;
   final String? deviceId;
   final bool? status;
-  final List docs;
+  final List? docs;
   UserData({
     this.city,
     this.contactNumber,
@@ -28,7 +28,7 @@ class UserData {
     this.userType,
     this.deviceId,
     this.status,
-    required this.docs,
+    this.docs,
   });
 
   Map<String, dynamic> toMap() {

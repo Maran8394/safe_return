@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first, use_build_context_synchronously
+// ignore_for_file: public_member_api_docs, sort_constructors_first, use_build_context_synchronously, empty_catches
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

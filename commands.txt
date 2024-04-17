@@ -1,0 +1,69 @@
+AutoSuggestDropDown(
+                                        initialValue: detectedVehicleNumber,
+                                        hintText: "Vehicle Number",
+                                        options: licensePlateNumbersOptions,
+                                        optionsBuilder: (TextEditingValue
+                                            textEditingValue) async {
+                                          ZoneRepo repo = ZoneRepo();
+                                          ListofCustomerDetailsModel model =
+                                              await repo
+                                                  .getVehicleNumbersAutoComplete(
+                                            query: textEditingValue.text,
+                                          );
+                                          licensePlateNumbersOptions.clear();
+                                          customerDetailsModel = model;
+                                          for (var m
+                                              in model.customerDetailsModel!) {
+                                            licensePlateNumbersOptions
+                                                .add(m.vehicle_number!);
+                                          }
+                                          return licensePlateNumbersOptions;
+                                        },
+                                        onChanged: (val) {
+                                          _vehicleNumberController.text = val;
+                                          if (val.isNotEmpty) {
+                                            setState(() {
+                                              isNoLicensePlateNumber = false;
+                                            });
+                                          } else {
+                                            _tokenController.clear();
+                                            _nameController.clear();
+                                            _emailController.clear();
+                                            _mobileNumberController.clear();
+                                            _vehicleNumberController.clear();
+                                            setState(() {
+                                              isNoLicensePlateNumber = true;
+                                            });
+                                          }
+                                        },
+                                        onSelected: (String selection) {
+                                          if (customerDetailsModel != null) {
+                                            for (var data
+                                                in customerDetailsModel!
+                                                    .customerDetailsModel!) {
+                                              if (data.vehicle_number
+                                                      .toString() ==
+                                                  selection.toString()) {
+                                                setState(() {
+                                                  if (data.name != null) {
+                                                    _nameController.text =
+                                                        data.name!;
+                                                  }
+                                                  if (data.mobile_number !=
+                                                      null) {
+                                                    _mobileNumberController
+                                                            .text =
+                                                        data.mobile_number!;
+                                                  }
+                                                  if (data.email != null) {
+                                                    _emailController.text =
+                                                        data.email!;
+                                                  }
+                                                  _vehicleNumberController
+                                                      .text = selection;
+                                                });
+                                              }
+                                            }
+                                          }
+                                        },
+                                      ),

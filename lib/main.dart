@@ -3,8 +3,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:safe_return/blocs/enforcer/enforcer_bloc.dart';
 import 'package:safe_return/blocs/public/public_bloc.dart';
+import 'package:safe_return/cubits/postCode/post_code_cubit.dart';
 import 'package:safe_return/firebase_options.dart';
 import 'package:safe_return/paths/route_generator.dart';
 import 'package:safe_return/paths/routes.dart';
@@ -12,8 +14,19 @@ import 'package:safe_return/screens/indexing_page.dart';
 import 'package:safe_return/utils/custom_methods.dart';
 import 'package:safe_return/utils/services/pushnotification_services.dart';
 
+Future<bool> requestNotificationPermission() async {
+  final status = await Permission.notification.request();
+
+  if (status.isGranted) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await requestNotificationPermission();
   await PushNotificationService().setupInteractedMessage();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final messaging = FirebaseMessaging.instance;
@@ -46,6 +59,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => EnforcerBloc(),
+        ),
+        BlocProvider(
+          create: (context) => PostCodeCubit(),
         ),
       ],
       child: MaterialApp(

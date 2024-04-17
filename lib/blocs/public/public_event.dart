@@ -7,7 +7,6 @@ class RegisterEvent extends PublicEvent {
   String name;
   String ic;
   String email;
-  String userId;
   String password;
   String occupation;
   String state;
@@ -19,7 +18,6 @@ class RegisterEvent extends PublicEvent {
     required this.name,
     required this.ic,
     required this.email,
-    required this.userId,
     required this.password,
     required this.occupation,
     required this.state,
@@ -33,7 +31,6 @@ class UpdateEvent extends PublicEvent {
   String name;
   String email;
   String ic;
-  String userId;
   String occupation;
   String state;
   String city;
@@ -42,7 +39,6 @@ class UpdateEvent extends PublicEvent {
     required this.name,
     required this.email,
     required this.ic,
-    required this.userId,
     required this.occupation,
     required this.state,
     required this.city,

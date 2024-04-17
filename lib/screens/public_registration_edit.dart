@@ -36,7 +36,6 @@ class _PublicRegistrationEditState extends State<PublicRegistrationEdit> {
   bool terms = true;
   final TextEditingController _name = TextEditingController();
   final TextEditingController _ic = TextEditingController();
-  final TextEditingController _userId = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _occupation = TextEditingController();
   String? choosedState;
@@ -51,7 +50,6 @@ class _PublicRegistrationEditState extends State<PublicRegistrationEdit> {
     setState(() {
       _name.text = widget.userData.name!;
       _ic.text = widget.userData.ic!;
-      _userId.text = widget.userData.userId!;
       _email.text = widget.userData.email!;
       _occupation.text = widget.userData.occupation!;
       _city.text = widget.userData.city!;
@@ -153,16 +151,6 @@ class _PublicRegistrationEditState extends State<PublicRegistrationEdit> {
                   SizedBox(height: size.height * 0.02),
 
                   const RequiredInputLabel(
-                    label: "User ID",
-                    isRequired: true,
-                  ),
-                  InputWidget(
-                    controller: _userId,
-                    isRequired: true,
-                  ),
-                  SizedBox(height: size.height * 0.02),
-
-                  const RequiredInputLabel(
                     label: "Email",
                     isRequired: true,
                   ),
@@ -256,7 +244,6 @@ class _PublicRegistrationEditState extends State<PublicRegistrationEdit> {
                                 name: _name.text.trim(),
                                 email: _email.text.trim(),
                                 ic: _ic.text.trim(),
-                                userId: _userId.text.trim(),
                                 occupation: _occupation.text.trim(),
                                 state: choosedState!,
                                 city: _city.text.trim(),

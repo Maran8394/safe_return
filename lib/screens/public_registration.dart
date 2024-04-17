@@ -36,7 +36,6 @@ class _PublicRegistrationState extends State<PublicRegistration> {
   bool terms = true;
   final TextEditingController _name = TextEditingController();
   final TextEditingController _ic = TextEditingController();
-  final TextEditingController _userId = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _occupation = TextEditingController();
@@ -144,6 +143,10 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                   InputWidget(
                     controller: _name,
                     isRequired: true,
+                    keyboardType: TextInputType.text,
+                    maxLines: 1,
+                    maxLength: 20,
+                    textOnly: true,
                   ),
                   SizedBox(height: size.height * 0.02),
 
@@ -155,16 +158,8 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                     controller: _ic,
                     isRequired: true,
                     keyboardType: TextInputType.number,
-                  ),
-                  SizedBox(height: size.height * 0.02),
-
-                  const RequiredInputLabel(
-                    label: "User ID",
-                    isRequired: true,
-                  ),
-                  InputWidget(
-                    controller: _userId,
-                    isRequired: true,
+                    maxLength: 12,
+                    maxLines: 1,
                   ),
                   SizedBox(height: size.height * 0.02),
 
@@ -186,6 +181,8 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                   InputWidget(
                     controller: _occupation,
                     isRequired: true,
+                    keyboardType: TextInputType.text,
+                    textOnly: true,
                   ),
                   SizedBox(height: size.height * 0.02),
 
@@ -244,6 +241,8 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                     controller: _contactNumber,
                     isRequired: true,
                     keyboardType: TextInputType.phone,
+                    maxLength: 11,
+                    maxLines: 1,
                   ),
                   SizedBox(height: size.height * 0.02),
 
@@ -256,6 +255,7 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                     isRequired: true,
                     obsecureText: true,
                     maxLines: 1,
+                    maxLength: 20,
                   ),
                   SizedBox(height: size.height * 0.02),
                   UploadField(
@@ -338,7 +338,6 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                                   name: _name.text.trim(),
                                   ic: _ic.text.trim(),
                                   email: _email.text.trim(),
-                                  userId: _userId.text.trim(),
                                   password: _password.text.trim(),
                                   occupation: _occupation.text.trim(),
                                   state: choosedState!,

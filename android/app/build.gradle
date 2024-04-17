@@ -50,7 +50,7 @@ android {
 
         applicationId "com.example.safe_return"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 28
+        targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

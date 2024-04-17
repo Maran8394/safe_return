@@ -234,18 +234,6 @@ class _ViewCaseState extends State<ViewCase> {
                                 setState(() {
                                   choosedState = value;
                                 });
-                                // if (_formKey.currentState!.validate()) {
-                                //   UserRepo userRepo = UserRepo();
-                                //   var items = await userRepo.getFilteredCases(
-                                //     name: _name.text.trim(),
-                                //     age: _age.text.trim(),
-                                //     state: value,
-                                //   );
-                                //   final caseDocsMo = items.docs.map((doc) {
-                                //     return CaseModel.fromMap(doc.data());
-                                //   }).toList();
-                                //   print(caseDocsMo);
-                                // }
                               }
                             },
                           ),

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,13 +7,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:safe_return/models/enforcer_profile_model.dart';
 import 'package:safe_return/models/user_data.dart';
 import 'package:safe_return/utils/custom_methods.dart';
+import 'package:http/http.dart' as http;
 
 class UserRepo {
   Future<String> registerUser(
     String name,
     String ic,
     String email,
-    String userId,
     String password,
     String occupation,
     String state,
@@ -27,11 +28,11 @@ class UserRepo {
         password: password,
       );
       final user = credential.user;
+      await credential.user!.sendEmailVerification();
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
         'name': name,
         'ic': ic,
         'email': email,
-        'userId': userId,
         'occupation': occupation,
         'state': state,
         'city': city,
@@ -68,23 +69,20 @@ class UserRepo {
       );
 
       if (userType == "public") {
-        final user = credential.user;
-        final docSnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .get();
-        final userDocData = docSnapshot.data();
+        bool isEmailVerified = credential.user!.emailVerified;
 
-        if (userDocData!['userId'] == userId) {
+        if (isEmailVerified == true) {
           return credential;
         } else {
-          throw Exception('Invalid user ID or password.');
+          throw Exception(
+            'Email is not verified, please check you registered email',
+          );
         }
       } else {
         return credential;
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == '"invalid-credential"') {
+      if (e.code == "invalid-credential") {
         throw Exception('invalid credentials');
       }
       if (e.code == 'user-not-found') {
@@ -167,7 +165,6 @@ class UserRepo {
   }
 
   Future<String> updateUser({
-    required String userId,
     required String name,
     required String email,
     required String ic,
@@ -352,5 +349,83 @@ class UserRepo {
     } else {
       throw Exception("No document found with caseId: $caseId");
     }
+  }
+
+  Future<List<String>> fetchPostCodes({String? val}) async {
+    List<String> tempZipCodeOptions = [];
+
+    Query query = FirebaseFirestore.instance.collection('post_code').limit(5);
+
+    if (val != null) {
+      query = query
+          .where('postcode', isGreaterThanOrEqualTo: val)
+          .where('postcode', isLessThan: '${val}z');
+    }
+    QuerySnapshot querySnapshot = await query.get();
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+      if (data != null) {
+        String postCode = "${data['postcode']}-${data['area_name']}";
+        tempZipCodeOptions.add(postCode);
+      }
+    }
+    return tempZipCodeOptions;
+  }
+
+  Future<Map<String, dynamic>?> getObjectByPostcodeAndAreaName(
+      String postcode, String areaName) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('post_code')
+          .where('postcode', isEqualTo: postcode)
+          .where('area_name', isEqualTo: areaName)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot snapshot = querySnapshot.docs.first;
+        return snapshot.data() as Map<String, dynamic>;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      // print('Error getting object by postcode and area name: $e');
+      return null;
+    }
+  }
+
+  Future<void> getUserDeviceId(
+    String victimName,
+    String stateName,
+  ) async {
+    List<String> deviceIds = [];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('state', isEqualTo: stateName)
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+
+      if (data != null) {
+        var dId = data["deviceId"];
+        if (dId != null) {
+          deviceIds.add(data["deviceId"]);
+        }
+      }
+    }
+    final response = await http.post(
+      Uri.parse("http://3.17.216.245/api/send-fcm"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        "deviceIds": deviceIds,
+        "victim_name": victimName,
+        "city": stateName,
+      }),
+    );
+    (response.statusCode);
   }
 }
