@@ -11,6 +11,7 @@ class RegisterEvent extends PublicEvent {
   String occupation;
   String state;
   String city;
+  String zipCode;
   String contactNumber;
   List uploadedFiles;
 
@@ -22,6 +23,7 @@ class RegisterEvent extends PublicEvent {
     required this.occupation,
     required this.state,
     required this.city,
+    required this.zipCode,
     required this.contactNumber,
     required this.uploadedFiles,
   });

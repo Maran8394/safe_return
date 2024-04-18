@@ -31,7 +31,9 @@ class EnforcerBloc extends Bloc<EnforcerEvent, EnforcerState> {
       try {
         await userRepo.addEnforcersToCases(
           event.enforcerId,
+          event.enforcerName,
           event.caseId,
+
         );
         emit(AssignStaffSuccessState());
       } catch (e) {

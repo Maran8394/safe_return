@@ -1,13 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, use_build_context_synchronously
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_return/blocs/enforcer/enforcer_bloc.dart';
+import 'package:safe_return/cubits/enforcers/enforcer_cubit.dart';
 
 import 'package:safe_return/models/case_model.dart';
-import 'package:safe_return/models/enforcer_profile_model.dart';
 import 'package:safe_return/paths/routes.dart';
+import 'package:safe_return/repo/user_repo.dart';
 import 'package:safe_return/utils/enums/state_enums.dart';
+import 'package:safe_return/widgets/auto_suggestion_dropdown.dart';
 import 'package:safe_return/widgets/constant_widgets.dart';
 import 'package:safe_return/widgets/custom_material_button.dart';
 import 'package:safe_return/widgets/input_label.dart';
@@ -27,6 +28,9 @@ class EnforcerAssignStaff extends StatefulWidget {
 class _EnforcerAssignStaffState extends State<EnforcerAssignStaff> {
   EnforcerBloc? _enforcerBloc;
   ProgressDialog? _dialog;
+  UserRepo? _userRepo;
+
+  EnforcerCubit? _enforcerCubit;
   String? imageCount;
   String? docCount;
   String? staff;
@@ -35,11 +39,14 @@ class _EnforcerAssignStaffState extends State<EnforcerAssignStaff> {
   void initState() {
     super.initState();
     _enforcerBloc = EnforcerBloc();
+    _enforcerCubit = EnforcerCubit();
+    _enforcerCubit!.fetchStaff();
+    _userRepo = UserRepo();
     _dialog = ProgressDialog(context);
     if (widget.caseModel.enforcers != null &&
         widget.caseModel.enforcers!.isNotEmpty) {
       setState(() {
-        staff = widget.caseModel.enforcers!.first;
+        staff = widget.caseModel.enforcers!.last;
       });
     }
   }
@@ -261,6 +268,7 @@ class _EnforcerAssignStaffState extends State<EnforcerAssignStaff> {
                       separatorBuilder: (context, index) =>
                           SizedBox(width: size.width * 0.03),
                       itemBuilder: (context, index) {
+                        String img = widget.caseModel.images!.elementAt(index);
                         return Container(
                           decoration: BoxDecoration(
                             border: Border.all(
@@ -270,86 +278,68 @@ class _EnforcerAssignStaffState extends State<EnforcerAssignStaff> {
                           ),
                           height: size.height * 0.18,
                           width: size.width * 0.28,
-                          child: const FlutterLogo(),
+                          child: Image.network(img),
                         );
                       },
                     ),
                   ),
                   SizedBox(height: size.height * 0.02),
                 ],
-                const RequiredInputLabel(label: "Assign Staff", isBold: true),
-                FutureBuilder(
-                    future:
-                        FirebaseFirestore.instance.collection("enforcer").get(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: CircularProgressIndicator.adaptive(),
+                BlocBuilder<EnforcerCubit, EnforcerCubitState>(
+                  bloc: _enforcerCubit,
+                  builder: (context, state) {
+                    if (state is GetEnforcerInitialState) {
+                      return const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      );
+                    }
+                    if (state is GetEnforcerFailedState) {
+                      return Center(
+                        child: Text(state.message),
+                      );
+                    }
+                    if (state is GetEnforcerSuccessState) {
+                      List<String> codes = [];
+                      codes = state.codes;
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey.shade300,
                           ),
-                        );
-                      }
-                      if (snapshot.hasError) {
-                        return Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: Text(snapshot.error.toString()),
-                          ),
-                        );
-                      }
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        final enforcerModel = snapshot.data!.docs.map((doc) {
-                          return EnforcerProfileModel.fromMap(doc.data());
-                        }).toList();
-
-                        return Container(
-                          height: size.height * 0.06,
-                          width: size.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              menuMaxHeight: size.height * 0.45,
-                              value: staff,
-                              items: enforcerModel
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e.id,
-                                      child: Text(e.name),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                if (widget.caseModel.enforcers == null ||
-                                    widget.caseModel.enforcers!.isEmpty) {
-                                  setState(() {
-                                    staff = value;
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                        );
-                      } else {
-                        return const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: Text("Something is wrong!"),
-                          ),
-                        );
-                      }
-                    }),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: AutoSuggestDropDown(
+                          hintText: "Assign Staff",
+                          initialValue: staff,
+                          options: codes,
+                          optionsBuilder:
+                              (TextEditingValue textEditingValue) async {
+                            List<String> fetchedCodes =
+                                await _userRepo!.fetchEnforcerStaffs(
+                              val: textEditingValue.text,
+                            );
+                            codes.clear();
+                            codes = fetchedCodes;
+                            return codes;
+                          },
+                          onChanged: (val) async {
+                            codes.clear();
+                            _enforcerCubit!.fetchStaff(
+                              val: val.toString(),
+                            );
+                            staff = val;
+                          },
+                          onSelected: (val) async {
+                            staff = val;
+                          },
+                        ),
+                      );
+                    }
+                    return const Center(
+                      child: Text("Unknown error"),
+                    );
+                  },
+                ),
                 SizedBox(height: size.height * 0.04),
                 if (widget.caseModel.enforcers != null &&
                     widget.caseModel.enforcers!.isNotEmpty) ...[
@@ -368,13 +358,15 @@ class _EnforcerAssignStaffState extends State<EnforcerAssignStaff> {
                     text: "Submit",
                     backgroundColor: Colors.green,
                     fontColor: Colors.white,
-                    onPress: () {
+                    onPress: () async {
                       if (staff != null) {
+                        Map<String, dynamic> eId =
+                            await _userRepo!.getEnforcerIdByName(staff!);
                         _enforcerBloc!.add(
                           AssignStaffEvent(
-                            caseId: widget.caseModel.caseId!,
-                            enforcerId: staff!,
-                          ),
+                              caseId: widget.caseModel.caseId!,
+                              enforcerId: eId['id'],
+                              enforcerName: eId['name']),
                         );
                       } else {
                         ConstantWidgets.showAlert(
@@ -386,6 +378,7 @@ class _EnforcerAssignStaffState extends State<EnforcerAssignStaff> {
                     },
                   )
                 ],
+                SizedBox(height: size.height * 0.05),
               ],
             ),
           ),

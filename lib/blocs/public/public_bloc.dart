@@ -24,6 +24,7 @@ class PublicBloc extends Bloc<PublicEvent, PublicState> {
           event.state,
           event.city,
           event.contactNumber,
+          event.zipCode,
           event.uploadedFiles,
         );
         emit(RegisterationSuccessState(successMessage: msg));

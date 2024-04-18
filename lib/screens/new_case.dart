@@ -237,18 +237,15 @@ class _NewCaseState extends State<NewCase> {
                                           );
                                         },
                                         onSelected: (String selection) async {
-                                          List<String> splitted =
-                                              (selection.split("-"));
                                           Map<String, dynamic>? object =
                                               await _userRepo!
                                                   .getObjectByPostcodeAndAreaName(
-                                                      splitted.first,
-                                                      splitted.last);
+                                            selection,
+                                          );
                                           cityController.text = object!["city"];
                                           stateController.text =
                                               object["state_name"];
-                                          zipCodeController.text =
-                                              splitted.first;
+                                          zipCodeController.text = selection;
                                         },
                                       ),
                                     ),

@@ -16,8 +16,10 @@ class ChangeUserVerifiedStatus extends EnforcerEvent {
 class AssignStaffEvent extends EnforcerEvent {
   String caseId;
   String enforcerId;
+  String enforcerName;
   AssignStaffEvent({
     required this.caseId,
     required this.enforcerId,
+    required this.enforcerName,
   });
 }

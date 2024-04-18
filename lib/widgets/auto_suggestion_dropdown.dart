@@ -40,7 +40,6 @@ class AutoSuggestDropDown extends StatelessWidget {
         VoidCallback onFieldSubmitted,
       ) {
         return TextFormField(
-          textCapitalization: TextCapitalization.characters,
           enableSuggestions: (disabled == true) ? false : true,
           readOnly: (disabled == true) ? true : false,
           controller: controller,

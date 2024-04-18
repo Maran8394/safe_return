@@ -19,6 +19,7 @@ class UserRepo {
     String state,
     String city,
     String contactNumber,
+    String zipCode,
     List docs,
   ) async {
     try {
@@ -41,6 +42,7 @@ class UserRepo {
         "status": false,
         "uId": user.uid,
         "docs": docs,
+        "zipCode": zipCode,
       });
       return "Registration successful!";
     } on FirebaseAuthException catch (e) {
@@ -329,7 +331,11 @@ class UserRepo {
     }
   }
 
-  Future<void> addEnforcersToCases(String enforcerId, String caseId) async {
+  Future<void> addEnforcersToCases(
+    String? enforcerId,
+    String? enforcerName,
+    String caseId,
+  ) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     WriteBatch batch = firestore.batch();
 
@@ -342,7 +348,10 @@ class UserRepo {
       DocumentReference caseRef = querySnapshot.docs[0].reference;
 
       batch.update(caseRef, {
-        'enforcers': FieldValue.arrayUnion([enforcerId]),
+        'enforcers': FieldValue.arrayUnion([
+          enforcerId,
+          enforcerName,
+        ]),
       });
 
       await batch.commit();
@@ -366,7 +375,29 @@ class UserRepo {
     for (var doc in querySnapshot.docs) {
       Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
       if (data != null) {
-        String postCode = "${data['postcode']}-${data['area_name']}";
+        String postCode = data['postcode'];
+        tempZipCodeOptions.add(postCode);
+      }
+    }
+    return tempZipCodeOptions;
+  }
+
+  Future<List<String>> fetchEnforcerStaffs({String? val}) async {
+    List<String> tempZipCodeOptions = [];
+
+    Query query = FirebaseFirestore.instance.collection('enforcer').limit(5);
+
+    if (val != null) {
+      query = query
+          .where('name', isGreaterThanOrEqualTo: val)
+          .where('name', isLessThan: '${val}z');
+    }
+    QuerySnapshot querySnapshot = await query.get();
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+      if (data != null) {
+        String postCode = data['name'];
         tempZipCodeOptions.add(postCode);
       }
     }
@@ -374,12 +405,11 @@ class UserRepo {
   }
 
   Future<Map<String, dynamic>?> getObjectByPostcodeAndAreaName(
-      String postcode, String areaName) async {
+      String postcode) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('post_code')
           .where('postcode', isEqualTo: postcode)
-          .where('area_name', isEqualTo: areaName)
           .limit(1)
           .get();
 
@@ -392,6 +422,58 @@ class UserRepo {
     } catch (e) {
       // print('Error getting object by postcode and area name: $e');
       return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getEnforcers(String staffName) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('enforcer')
+          .where('name', isGreaterThanOrEqualTo: staffName)
+          .where('name', isLessThan: '${staffName}z')
+          .limit(5)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot snapshot = querySnapshot.docs.first;
+        return snapshot.data() as Map<String, dynamic>;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<Map<String, String>> getEnforcerIdByName(String name) async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('enforcer')
+              .where('name', isEqualTo: name)
+              .limit(1) // Limit to 1 document since name should be unique
+              .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return {
+          'name': name,
+          'id': querySnapshot.docs.first.id,
+        };
+      } else {
+        // If no enforcer found with the given name, create a new enforcer
+        final DocumentReference<Map<String, dynamic>> newEnforcerRef =
+            FirebaseFirestore.instance.collection('enforcer').doc();
+        await newEnforcerRef.set({'name': name, 'id': newEnforcerRef.id});
+        // Return the ID of the newly created enforcer
+        return {
+          'name': name,
+          'id': newEnforcerRef.id,
+        };
+      }
+    } catch (e) {
+      print("Error fetching/enforcing enforcer ID: $e");
+      // You can handle errors here, e.g., throwing an exception
+      rethrow;
     }
   }
 

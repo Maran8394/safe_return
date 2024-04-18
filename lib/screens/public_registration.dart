@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:safe_return/blocs/public/public_bloc.dart';
+import 'package:safe_return/cubits/postCode/post_code_cubit.dart';
 import 'package:safe_return/paths/routes.dart';
 import 'package:safe_return/repo/user_repo.dart';
 import 'package:safe_return/screens/case_list.dart';
 import 'package:safe_return/screens/indexing_page.dart';
-import 'package:safe_return/utils/constants/states_list.dart';
 import 'package:safe_return/utils/enums/state_enums.dart';
+import 'package:safe_return/widgets/auto_suggestion_dropdown.dart';
 import 'package:safe_return/widgets/constant_widgets.dart';
 import 'package:safe_return/widgets/custom_material_button.dart';
 import 'package:safe_return/widgets/input_label.dart';
@@ -28,6 +29,8 @@ class PublicRegistration extends StatefulWidget {
 
 class _PublicRegistrationState extends State<PublicRegistration> {
   PublicBloc? _publicBloc;
+  PostCodeCubit? _postCodeCubit;
+  UserRepo? _userRepo;
   FirebaseAuth auth = FirebaseAuth.instance;
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
@@ -41,6 +44,8 @@ class _PublicRegistrationState extends State<PublicRegistration> {
   final TextEditingController _occupation = TextEditingController();
   String? choosedState;
   final TextEditingController _city = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _zipCodeController = TextEditingController();
   final TextEditingController _contactNumber = TextEditingController();
 
   @override
@@ -48,9 +53,9 @@ class _PublicRegistrationState extends State<PublicRegistration> {
     super.initState();
     dialog = ProgressDialog(context);
     _publicBloc = PublicBloc();
-    setState(() {
-      choosedState = MalaysiaStates.states.first;
-    });
+    _postCodeCubit = PostCodeCubit();
+    _userRepo = UserRepo();
+    _postCodeCubit!.fetchPostCodes();
   }
 
   @override
@@ -185,41 +190,79 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                     textOnly: true,
                   ),
                   SizedBox(height: size.height * 0.02),
+                  const RequiredInputLabel(
+                    label: "Zip Code",
+                    isRequired: true,
+                  ),
+                  BlocBuilder<PostCodeCubit, PostCodeState>(
+                    bloc: _postCodeCubit,
+                    builder: (context, state) {
+                      if (state is PostCodeInitialState) {
+                        return const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        );
+                      }
+                      if (state is PostCodeSuccessState) {
+                        List<String> codes = [];
+                        codes = state.codes;
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: AutoSuggestDropDown(
+                            textInputType: TextInputType.number,
+                            hintText: "",
+                            options: codes,
+                            maxLength: 5,
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) async {
+                              List<String> fetchedCodes =
+                                  await _userRepo!.fetchPostCodes(
+                                val: textEditingValue.text,
+                              );
+                              codes.clear();
+                              codes = fetchedCodes;
+                              return codes;
+                            },
+                            onChanged: (val) {
+                              codes.clear();
+                              _postCodeCubit!.fetchPostCodes(
+                                val: val.toString(),
+                              );
+                            },
+                            onSelected: (String selection) async {
+                              Map<String, dynamic>? object = await _userRepo!
+                                  .getObjectByPostcodeAndAreaName(selection);
+                              _city.text = object!["city"];
+                              _stateController.text = object["state_name"];
+                              _zipCodeController.text = selection;
+                            },
+                          ),
+                        );
+                      }
+                      if (state is PostCodeFailedState) {
+                        return Center(
+                          child: Text(state.message),
+                        );
+                      } else {
+                        return const Center(
+                          child: Text("Unknown error"),
+                        );
+                      }
+                    },
+                  ),
 
                   const RequiredInputLabel(
                     label: "State",
                     isRequired: true,
                   ),
-                  Container(
-                    height: size.height * 0.07,
-                    width: size.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                      ),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        menuMaxHeight: size.height * 0.25,
-                        value: MalaysiaStates.states.first.toLowerCase(),
-                        items: MalaysiaStates.states
-                            .map(
-                              (e) => DropdownMenuItem(
-                                value: e.toLowerCase(),
-                                child: Text(e),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            choosedState = value;
-                          });
-                        },
-                      ),
-                    ),
+                  InputWidget(
+                    controller: _stateController,
+                    isRequired: true,
+                    readOnly: true,
                   ),
                   SizedBox(height: size.height * 0.02),
 
@@ -230,6 +273,7 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                   InputWidget(
                     controller: _city,
                     isRequired: true,
+                    readOnly: true,
                   ),
                   SizedBox(height: size.height * 0.02),
 
@@ -340,8 +384,9 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                                   email: _email.text.trim(),
                                   password: _password.text.trim(),
                                   occupation: _occupation.text.trim(),
-                                  state: choosedState!,
+                                  state: _stateController.text.trim(),
                                   city: _city.text.trim(),
+                                  zipCode: _zipCodeController.text,
                                   contactNumber: _contactNumber.text.trim(),
                                   uploadedFiles: documents,
                                 ),

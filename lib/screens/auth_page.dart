@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:safe_return/blocs/public/public_bloc.dart';
@@ -16,6 +17,7 @@ import 'package:safe_return/widgets/constant_widgets.dart';
 import 'package:safe_return/widgets/custom_material_button.dart';
 import 'package:safe_return/widgets/input_widget.dart';
 import 'package:safe_return/widgets/progress_dialog.dart';
+import 'package:csv/csv.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -39,11 +41,38 @@ class _AuthPageState extends State<AuthPage> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
+  final CollectionReference _collectionRef =
+      FirebaseFirestore.instance.collection('myPostCodes');
+
   @override
   void initState() {
     super.initState();
     _publicBloc = PublicBloc();
     _dialog = ProgressDialog(context);
+    _uploadCSVToFirestore();
+  }
+
+  Future<void> _uploadCSVToFirestore() async {
+    String csvData =
+        await rootBundle.loadString('assets/images/my_postcode.csv');
+
+    List<List<dynamic>> rows = const CsvToListConverter().convert(csvData);
+
+    for (List<dynamic> row in rows) {
+      String postcode = row[0].toString();
+      String postOffice = row[1].toString();
+      String stateName = row[2].toString();
+
+      // Create a map of data to upload to Firestore
+      Map<String, dynamic> data = {
+        'postcode': postcode,
+        'city': postOffice,
+        'state_name': stateName,
+      };
+
+      // Add data to Firestore
+      await _collectionRef.add(data);
+    }
   }
 
   @override

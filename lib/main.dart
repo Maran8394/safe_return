@@ -6,12 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:safe_return/blocs/enforcer/enforcer_bloc.dart';
 import 'package:safe_return/blocs/public/public_bloc.dart';
+import 'package:safe_return/cubits/enforcers/enforcer_cubit.dart';
 import 'package:safe_return/cubits/postCode/post_code_cubit.dart';
 import 'package:safe_return/firebase_options.dart';
 import 'package:safe_return/paths/route_generator.dart';
 import 'package:safe_return/paths/routes.dart';
 import 'package:safe_return/screens/indexing_page.dart';
-import 'package:safe_return/utils/custom_methods.dart';
 import 'package:safe_return/utils/services/pushnotification_services.dart';
 
 Future<bool> requestNotificationPermission() async {
@@ -26,7 +26,6 @@ Future<bool> requestNotificationPermission() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await requestNotificationPermission();
   await PushNotificationService().setupInteractedMessage();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final messaging = FirebaseMessaging.instance;
@@ -41,9 +40,6 @@ void main() async {
   );
 
   runApp(MyApp());
-  await sendPushMessage(
-    "cRBid4nyQdWWnN4dmIgMTL:APA91bF0KRArQ26m3kBoIa7lrNp6t2S8BGiUPRhL9sOvVJapfZJERnqEidZdYQSppQEQaHfLX8plrXlqjHCwi8whhyZeGMpUdkXbm7CKd-K9SWdw74EmQ_90o2oJaJZQis9kCkeFEYhf",
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -62,6 +58,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => PostCodeCubit(),
+        ),
+        BlocProvider(
+          create: (context) => EnforcerCubit(),
         ),
       ],
       child: MaterialApp(

@@ -13,6 +13,7 @@ class UserData {
   final String? uId;
   final String? userType;
   final String? deviceId;
+  final String? zipCode;
   final bool? status;
   final List? docs;
   UserData({
@@ -27,6 +28,7 @@ class UserData {
     this.uId,
     this.userType,
     this.deviceId,
+    this.zipCode,
     this.status,
     this.docs,
   });
@@ -46,6 +48,7 @@ class UserData {
       'deviceId': deviceId,
       'status': status,
       'docs': docs,
+      'zipCode': zipCode,
     };
   }
 
@@ -60,6 +63,7 @@ class UserData {
       occupation:
           map['occupation'] != null ? map['occupation'] as String : null,
       state: map['state'] != null ? map['state'] as String : null,
+      zipCode: map['zipCode'] != null ? map['zipCode'] as String : null,
       userId: map['userId'] != null ? map['userId'] as String : null,
       uId: map['uId'] != null ? map['uId'] as String : null,
       userType: map['userType'] != null ? map['userType'] as String : null,
