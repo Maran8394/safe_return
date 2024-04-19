@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:safe_return/blocs/public/public_bloc.dart';
@@ -17,7 +16,6 @@ import 'package:safe_return/widgets/constant_widgets.dart';
 import 'package:safe_return/widgets/custom_material_button.dart';
 import 'package:safe_return/widgets/input_widget.dart';
 import 'package:safe_return/widgets/progress_dialog.dart';
-import 'package:csv/csv.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -33,6 +31,7 @@ class _AuthPageState extends State<AuthPage> {
   FirebaseAuth auth = FirebaseAuth.instance;
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
+  final _forgotPasswordFormKey = GlobalKey<FormState>();
 
   bool isPublic = true;
   bool isEnforcer = false;
@@ -40,40 +39,42 @@ class _AuthPageState extends State<AuthPage> {
   final TextEditingController _userId = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final TextEditingController _forgotPasswordEmail = TextEditingController();
 
-  final CollectionReference _collectionRef =
-      FirebaseFirestore.instance.collection('myPostCodes');
+  // final CollectionReference _collectionRef =
+  //     FirebaseFirestore.instance.collection('post_code');
 
   @override
   void initState() {
     super.initState();
     _publicBloc = PublicBloc();
     _dialog = ProgressDialog(context);
-    _uploadCSVToFirestore();
+    // _uploadCSVToFirestore();
   }
 
-  Future<void> _uploadCSVToFirestore() async {
-    String csvData =
-        await rootBundle.loadString('assets/images/my_postcode.csv');
+  // Future<void> _uploadCSVToFirestore() async {
+  //   String csvData =
+  //       await rootBundle.loadString('assets/images/my_postcode.csv');
 
-    List<List<dynamic>> rows = const CsvToListConverter().convert(csvData);
+  //   List<List<dynamic>> rows = const CsvToListConverter().convert(csvData);
 
-    for (List<dynamic> row in rows) {
-      String postcode = row[0].toString();
-      String postOffice = row[1].toString();
-      String stateName = row[2].toString();
+  //   for (List<dynamic> row in rows) {
+  //     String postcode = row[0].toString();
+  //     String postOffice = row[1].toString();
+  //     String stateName = row[2].toString();
+  //     // Create a map of data to upload to Firestore
+  //     Map<String, dynamic> data = {
+  //       'postcode': postcode,
+  //       'city': postOffice,
+  //       'state_name': stateName,
+  //     };
 
-      // Create a map of data to upload to Firestore
-      Map<String, dynamic> data = {
-        'postcode': postcode,
-        'city': postOffice,
-        'state_name': stateName,
-      };
-
-      // Add data to Firestore
-      await _collectionRef.add(data);
-    }
-  }
+  //     // Add data to Firestore
+  //     await _collectionRef.add(data);
+  //     print("ADDED");
+  //   }
+  //   print("FINISHED");
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -214,14 +215,82 @@ class _AuthPageState extends State<AuthPage> {
                         isRequired: true,
                       ),
                       SizedBox(height: size.height * 0.02),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          "Forgot password?",
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    color: Colors.cyanAccent.shade700,
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog.adaptive(
+                                title: const Center(
+                                    child: Text("Forgot Password")),
+                                content: InputWidget(
+                                  keyboardType: TextInputType.emailAddress,
+                                  hintText: "Email",
+                                  controller: _forgotPasswordEmail,
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: const Text("Cancel"),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
                                   ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      if (_forgotPasswordEmail
+                                          .text.isNotEmpty) {
+                                        try {
+                                          await FirebaseAuth.instance
+                                              .sendPasswordResetEmail(
+                                            email: _forgotPasswordEmail.text,
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Password reset email sent",
+                                              ),
+                                            ),
+                                          );
+                                          Navigator.pop(context);
+                                        } catch (error) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Error: ${error.toString()}",
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text("Email is required"),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: const Text("Submit"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Forgot password?",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color: Colors.cyanAccent.shade700,
+                                ),
+                          ),
                         ),
                       ),
                       SizedBox(height: size.height * 0.03),

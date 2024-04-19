@@ -40,7 +40,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
     if (widget.caseModel.enforcers != null &&
         widget.caseModel.enforcers!.isNotEmpty) {
       setState(() {
-        staff = widget.caseModel.enforcers!.first;
+        staff = widget.caseModel.enforcers!.last;
       });
     }
     getEnforcerById(staff);
@@ -156,16 +156,18 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Case Id")),
+                          const Expanded(flex: 2, child: Text("Case Id")),
                           Expanded(
-                              flex: 2, child: Text(widget.caseModel.caseId!)),
+                            flex: 2,
+                            child: Text(widget.caseModel.caseId!),
+                          ),
                         ],
                       ),
                       SizedBox(height: size.height * 0.02),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Name")),
+                          const Expanded(flex: 2, child: Text("Name")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.name!)),
                         ],
@@ -174,7 +176,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Age")),
+                          const Expanded(flex: 2, child: Text("Age")),
                           Expanded(flex: 2, child: Text(widget.caseModel.age!)),
                         ],
                       ),
@@ -182,7 +184,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Race")),
+                          const Expanded(flex: 2, child: Text("Race")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.race!)),
                         ],
@@ -191,7 +193,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Height")),
+                          const Expanded(flex: 2, child: Text("Height")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.height!)),
                         ],
@@ -200,7 +202,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Weight")),
+                          const Expanded(flex: 2, child: Text("Weight")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.weight!)),
                         ],
@@ -209,7 +211,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Hair color")),
+                          const Expanded(flex: 2, child: Text("Hair color")),
                           Expanded(
                               flex: 2,
                               child: Text(widget.caseModel.hairColor!)),
@@ -219,7 +221,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Eye color")),
+                          const Expanded(flex: 2, child: Text("Eye color")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.eyeColor!)),
                         ],
@@ -229,7 +231,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           const Expanded(
-                              flex: 1, child: Text("Date of last Contact")),
+                              flex: 2, child: Text("Date of last Contact")),
                           Expanded(
                               flex: 2,
                               child: Text(widget.caseModel.dateOfLastContact!)),
@@ -240,7 +242,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           const Expanded(
-                              flex: 1,
+                              flex: 2,
                               child: Text("Circumstances of disappearance")),
                           Expanded(
                               flex: 2,
@@ -252,7 +254,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Description")),
+                          const Expanded(flex: 2, child: Text("Description")),
                           Expanded(
                               flex: 2,
                               child: Text(widget.caseModel.description!)),
@@ -262,7 +264,7 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("City")),
+                          const Expanded(flex: 2, child: Text("City")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.city!)),
                         ],
@@ -271,25 +273,17 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("State")),
+                          const Expanded(flex: 2, child: Text("State")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.state!)),
                         ],
                       ),
                       SizedBox(height: size.height * 0.02),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          const Expanded(flex: 1, child: Text("Country")),
-                          Expanded(
-                              flex: 2, child: Text(widget.caseModel.country!)),
-                        ],
-                      ),
                       SizedBox(height: size.height * 0.02),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Expanded(flex: 1, child: Text("Zip Code")),
+                          const Expanded(flex: 2, child: Text("Zip Code")),
                           Expanded(
                               flex: 2, child: Text(widget.caseModel.zipCode!)),
                         ],
@@ -339,10 +333,10 @@ class _PublicCaseDetailState extends State<PublicCaseDetail> {
                             color: Colors.grey.shade300,
                           ),
                         ),
-                        child: (_enforcerProfileModel != null)
+                        child: (staff != null)
                             ? Center(
                                 child: Text(
-                                  _enforcerProfileModel!.name,
+                                  staff!,
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                               )

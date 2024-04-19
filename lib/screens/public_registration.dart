@@ -197,6 +197,7 @@ class _PublicRegistrationState extends State<PublicRegistration> {
                   BlocBuilder<PostCodeCubit, PostCodeState>(
                     bloc: _postCodeCubit,
                     builder: (context, state) {
+                      print(state);
                       if (state is PostCodeInitialState) {
                         return const Center(
                           child: CircularProgressIndicator.adaptive(),

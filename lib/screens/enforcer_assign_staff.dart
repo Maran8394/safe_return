@@ -240,19 +240,15 @@ class _EnforcerAssignStaffState extends State<EnforcerAssignStaff> {
                   ],
                 ),
                 SizedBox(height: size.height * 0.02),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    const Expanded(flex: 1, child: Text("Country")),
-                    Expanded(flex: 2, child: Text(widget.caseModel.country!)),
-                  ],
-                ),
                 SizedBox(height: size.height * 0.02),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     const Expanded(flex: 1, child: Text("Zip Code")),
-                    Expanded(flex: 2, child: Text(widget.caseModel.zipCode!)),
+                    Expanded(
+                      flex: 2,
+                      child: Text(widget.caseModel.zipCode!),
+                    ),
                   ],
                 ),
                 SizedBox(height: size.height * 0.02),
