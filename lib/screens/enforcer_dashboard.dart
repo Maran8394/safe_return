@@ -75,14 +75,46 @@ class _EnforcerDashboardState extends State<EnforcerDashboard> {
                   ),
                   ListTile(
                     leading: const Icon(
-                      Icons.group_add_outlined,
+                      Icons.article_outlined,
                       size: 30,
                     ),
-                    title: const Text("Assign Staff"),
+                    title: const Text("Cases"),
                     onTap: () {
                       Navigator.pushNamed(
                         context,
                         Routes.caseList,
+                      );
+                    },
+                  ),
+                  const Divider(
+                    height: 10,
+                  ),
+                  // ListTile(
+                  //   leading: const Icon(
+                  //     Icons.group_add_outlined,
+                  //     size: 30,
+                  //   ),
+                  //   title: const Text("Assign Staff"),
+                  //   onTap: () {
+                  //     Navigator.pushNamed(
+                  //       context,
+                  //       Routes.caseList,
+                  //     );
+                  //   },
+                  // ),
+                  // const Divider(
+                  //   height: 10,
+                  // ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.pie_chart_outline,
+                      size: 30,
+                    ),
+                    title: const Text("Reports"),
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        Routes.enforcerReports,
                       );
                     },
                   ),

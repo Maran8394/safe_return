@@ -5,6 +5,7 @@ class Routes {
   static const String newCase = "newCase";
   static const String publicDashboard = "publicDashboard";
   static const String enforcerDashboard = "enforcerDashboard";
+  static const String enforcerReports = "enforcerReports";
   static const String enforcerVerificationListing =
       "enforcerVerificationListing";
 

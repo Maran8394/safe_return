@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_function_literals_in_foreach_calls
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:safe_return/models/enforcer_profile_model.dart';
+import 'package:safe_return/models/reports_data.dart';
 import 'package:safe_return/models/user_data.dart';
 import 'package:safe_return/utils/custom_methods.dart';
 import 'package:http/http.dart' as http;
@@ -209,6 +212,20 @@ class UserRepo {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> updateIsItSolved(String caseId, bool newValue) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('cases')
+          .where('caseId', isEqualTo: caseId)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        querySnapshot.docs.forEach((doc) async {
+          await doc.reference.update({'isItSolved': newValue});
+        });
+      });
+    } catch (e) {}
   }
 
   Future<String> updatePassword(
@@ -472,7 +489,6 @@ class UserRepo {
       }
     } catch (e) {
       print("Error fetching/enforcing enforcer ID: $e");
-      // You can handle errors here, e.g., throwing an exception
       rethrow;
     }
   }
@@ -509,5 +525,35 @@ class UserRepo {
       }),
     );
     (response.statusCode);
+  }
+
+  Future<ReportsData> getEnforcerReportsData() async {
+    CollectionReference totalSnapshots =
+        FirebaseFirestore.instance.collection('cases');
+
+    // QuerySnapshot notAssignedSnapshot =
+    //     await totalSnapshots.where('enforcers', isEqualTo: null).get();
+
+    QuerySnapshot solvedSnapshot = await totalSnapshots
+        .where('isItSolved', isEqualTo: true)
+        .where('enforcers', isNotEqualTo: null)
+        .get();
+
+    QuerySnapshot unsolvedSnapshot = await totalSnapshots
+        .where('isItSolved', isEqualTo: false)
+        .where('enforcers', isNotEqualTo: null)
+        .get();
+
+    int solvedCount = solvedSnapshot.size;
+    int unsolvedCount = unsolvedSnapshot.size;
+
+    int totalCount = solvedCount + unsolvedCount;
+
+    ReportsData reportsData = ReportsData(
+      solved: solvedCount,
+      unSolved: unsolvedCount,
+      total: totalCount,
+    );
+    return reportsData;
   }
 }

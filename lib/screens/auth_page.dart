@@ -31,7 +31,6 @@ class _AuthPageState extends State<AuthPage> {
   FirebaseAuth auth = FirebaseAuth.instance;
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
-  final _forgotPasswordFormKey = GlobalKey<FormState>();
 
   bool isPublic = true;
   bool isEnforcer = false;
@@ -96,6 +95,7 @@ class _AuthPageState extends State<AuthPage> {
 
               if (userType == "public") {
                 _firebaseMessaging.getToken().then((token) async {
+                  print(token);
                   UserRepo repo = UserRepo();
                   repo.updateUserData({"deviceId": token!});
                 });

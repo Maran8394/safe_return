@@ -3,6 +3,7 @@ import 'package:safe_return/paths/routes.dart';
 import 'package:safe_return/screens/case_list.dart';
 import 'package:safe_return/screens/enforcer_assign_staff.dart';
 import 'package:safe_return/screens/enforcer_dashboard.dart';
+import 'package:safe_return/screens/enforcer_reports.dart';
 import 'package:safe_return/screens/enforcer_verification_detail.dart';
 import 'package:safe_return/screens/enforcer_verification_listing.dart';
 import 'package:safe_return/screens/indexing_page.dart';
@@ -89,6 +90,10 @@ class RouteGenerator {
       case Routes.caseList:
         return MaterialPageRoute(
           builder: (_) => const CaseList(),
+        );
+      case Routes.enforcerReports:
+        return MaterialPageRoute(
+          builder: (_) => const EnforcerReports(),
         );
 
       default:

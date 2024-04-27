@@ -32,3 +32,31 @@ class AssignStaffFailedState extends EnforcerState {
     required this.errorMessage,
   });
 }
+
+class GetEnforcerReportsDataInitState extends EnforcerState {}
+
+class GetEnforcerReportsDataSuccessState extends EnforcerState {
+  final ReportsData reportsData;
+
+  GetEnforcerReportsDataSuccessState({required this.reportsData});
+}
+
+class GetEnforcerReportsDataFailedState extends EnforcerState {
+  final String errorMessage;
+
+  GetEnforcerReportsDataFailedState({required this.errorMessage});
+}
+
+class GetCasesInitState extends EnforcerState {}
+
+class GetCasesSuccessState extends EnforcerState {
+  final List<CaseModel> caseModel;
+
+  GetCasesSuccessState({required this.caseModel});
+}
+
+class GetCasesFailedState extends EnforcerState {
+  final String errorMessage;
+
+  GetCasesFailedState({required this.errorMessage});
+}

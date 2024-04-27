@@ -328,41 +328,7 @@ class _NewCaseState extends State<NewCase> {
                         //   ),
                         // ),
                         SizedBox(height: size.height * 0.02),
-                        // const RequiredInputLabel(label: "Country"),
-                        // SizedBox(height: size.height * 0.01),
-                        // Container(
-                        //   height: size.height * 0.06,
-                        //   width: size.width,
-                        //   decoration: BoxDecoration(
-                        //     color: Colors.white,
-                        //     borderRadius: BorderRadius.circular(10),
-                        //     border: Border.all(
-                        //       color: Colors.grey.shade300,
-                        //     ),
-                        //   ),
-                        //   child: DropdownButtonHideUnderline(
-                        //     child: DropdownButton(
-                        //       alignment: AlignmentDirectional.centerStart,
-                        //       padding: const EdgeInsets.symmetric(horizontal: 8),
-                        //       menuMaxHeight: size.height * 0.45,
-                        //       value: country,
-                        //       items: DropDownValues.countries
-                        //           .map(
-                        //             (e) => DropdownMenuItem(
-                        //               value: e.toLowerCase(),
-                        //               child: Text(e),
-                        //             ),
-                        //           )
-                        //           .toList(),
-                        //       onChanged: (value) {
-                        //         setState(() {
-                        //           country = value!;
-                        //         });
-                        //       },
-                        //     ),
-                        //   ),
-                        // ),
-                        // SizedBox(height: size.height * 0.02),
+
                         const RequiredInputLabel(
                           label: "Circumstances of disapperance",
                         ),
@@ -419,7 +385,8 @@ class _NewCaseState extends State<NewCase> {
                               child: DropdownButtonHideUnderline(
                                 child: DropdownButton(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                    horizontal: 10,
+                                  ),
                                   menuMaxHeight: size.height * 0.45,
                                   value: race,
                                   items: DropDownValues.race
@@ -432,7 +399,7 @@ class _NewCaseState extends State<NewCase> {
                                       .toList(),
                                   onChanged: (value) {
                                     setState(() {
-                                      hairColor = value!;
+                                      race = value!;
                                     });
                                   },
                                 ),
@@ -633,10 +600,6 @@ class _NewCaseState extends State<NewCase> {
                             height: size.height * 0.06,
                             text: "SUBMIT",
                             onPress: () async {
-                              // _userRepo!.getUserDeviceId(
-                              //   nameController.text,
-                              //   stateController.text,
-                              // );
                               if (_formKey.currentState!.validate()) {
                                 final userId =
                                     FirebaseAuth.instance.currentUser?.uid;
@@ -660,6 +623,7 @@ class _NewCaseState extends State<NewCase> {
                                   'userId': userId,
                                   "caseId": generateCaseId(),
                                   "status": true,
+                                  "isItSolved": false,
                                 };
                                 UserRepo userRepo = UserRepo();
 

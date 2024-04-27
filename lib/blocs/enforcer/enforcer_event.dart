@@ -23,3 +23,8 @@ class AssignStaffEvent extends EnforcerEvent {
     required this.enforcerName,
   });
 }
+
+class GetReportsDataEvent extends EnforcerEvent {}
+
+
+class GetCasesListEvent extends EnforcerEvent{}
